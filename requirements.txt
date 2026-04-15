@@ -1,9 +1,6 @@
-flask
-twilio
-python-dotenv
 opencv-python
-ultralytics
 face_recognition
-numpy
-gunicorn
-
+dlib
+ultralytics
+torch
+torchvision
