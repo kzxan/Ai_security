@@ -1,5 +1,6 @@
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
+from gpt_helper import ask_gpt
 
 from state import (
     get_status_text,
@@ -14,53 +15,27 @@ app = Flask(__name__)
 def smart_reply(user_text: str) -> str:
     text = user_text.lower().strip()
 
-    if text in ["сәлем", "салем", "hello", "hi"]:
-        return (
-            "Сәлем 👋\n"
-            "Мен AI қауіпсіздік ботымын.\n"
-            "Командалар:\n"
-            "• қауіп бар ма\n"
-            "• status\n"
-            "• summary\n"
-            "• соңғы сурет\n"
-            "• help"
-        )
-
-    if "қауіп бар ма" in text or text == "status danger":
+    # 🔒 қауіп командасы бірінші
+    if "қауіп бар ма" in text:
         return get_status_text()
 
-    if text == "status":
+    if "status" == text:
         return get_system_uptime_text()
 
-    if "summary" in text or "қорытынды" in text:
+    if "summary" in text:
         return get_summary_text()
 
-    if "соңғы сурет" in text or "last image" in text:
+    if "соңғы сурет" in text:
         image_path = get_last_image_path()
         if image_path:
-            return f"🖼 Соңғы сақталған сурет бар:\n{image_path}\n\nҚазір файл локалда сақталған."
-        return "🖼 Соңғы сурет әлі жоқ."
+            return f"🖼 Соңғы сурет:\n{image_path}"
+        return "Сурет жоқ"
 
-    if text == "help" or text == "көмек":
-        return (
-            " Қол жетімді командалар:\n"
-            "• қауіп бар ма\n"
-            "• status\n"
-            "• summary\n"
-            "• соңғы сурет\n"
-            "• help"
-        )
+    if text == "help":
+        return "Командалар:\nstatus\nқауіп бар ма\nsummary\nсоңғы сурет"
 
-    return (
-        "🤖 Сұрағыңды түсіндім, бірақ қазір менің негізгі функциям — қауіпсіздік мониторингі.\n\n"
-        "Мыналарды жаза аласың:\n"
-        "• қауіп бар ма\n"
-        "• status\n"
-        "• summary\n"
-        "• соңғы сурет\n"
-        "• help"
-    )
-
+    # 🤖 ҚАЛҒАН БӘРІ → GPT
+    return ask_gpt(user_text)
 
 @app.route("/")
 def home():
