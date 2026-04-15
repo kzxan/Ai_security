@@ -1,6 +1,6 @@
-opencv-python
-face_recognition
-dlib
-ultralytics
-torch
-torchvision
+flask
+twilio
+openai
+python-dotenv
+gunicorn
+requests
